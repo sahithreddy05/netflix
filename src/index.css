@@ -3,7 +3,11 @@
 @tailwind utilities;
 
 body {
-    background: theme("colors.dark");
-    color: theme("colors.white");
-    /* min-height: theme("height.screen"); */
+  background: theme("colors.dark");
+  color: theme("colors.white");
+  /* min-height: theme("height.screen"); */
+}
+
+.row-container .opacity-0 {
+  opacity: theme("opacity.100");
 }
