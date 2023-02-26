@@ -1,30 +1,44 @@
 import { useState, Fragment, ReactElement, useEffect, useRef, LegacyRef } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
+import { Position } from '../common/types';
 
 type ModalProps = {
   isOpen: boolean;
   onClose: (value: boolean) => void;
   title: string | ReactElement;
   children: React.ReactElement;
+  closeModal:()=>void;
+  position:Position | null;
 }
 export default function Modal({
   isOpen,
   onClose,
   title,
-  children
+  children,
+  closeModal,
+  position
+  
 }: ModalProps) {
 
-  const panelRef = useRef<HTMLElement>(null);
-  function onMouseleave(e) {
-    console.log("left");
+  const panelRef = useRef<HTMLDivElement>(null);
+  function onMouseleave() {
+    console.log("move leave happened");
+    // closeModal();
 
   }
 
   useEffect(() => {
+    console.log(panelRef.current);
+    if(isOpen) {
     if (panelRef.current) {
-      panelRef.current?.addEventListener("mouseleave", onMouseleave)
+      panelRef.current?.addEventListener("mouseleave", () => {
+        console.log("mouse enter happened");
+        
+      })
     }
-  }, [panelRef.current])
+    // panelRef.current?.addEventListener("mouseleave", onMouseleave)
+  }
+  }, [isOpen])
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
@@ -42,7 +56,7 @@ export default function Modal({
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4 text-center">
+          <div className="flex min-h-full items-center justify-center text-center">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
@@ -51,8 +65,21 @@ export default function Modal({
               leave="ease-in duration-200"
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
+              afterEnter={() => {
+                panelRef.current?.addEventListener("mouseleave", onMouseleave)
+              } }
+              afterLeave={() => {
+                panelRef.current?.removeEventListener("mouseleave", onMouseleave)
+              } }
             >
-              <Dialog.Panel ref={panelRef} className="transform overflow-hidden rounded-2xl bg-dark p-6 text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel
+               
+               ref={panelRef} 
+               style={position? {
+                position:"fixed",
+                ...position
+               }:{}}
+               className="transform overflow-hidden rounded-2xl bg-dark text-left align-middle shadow-xl transition-all">
                 <Dialog.Title
                   as="h3"
                   className="text-lg font-medium leading-6 text-white"
